@@ -3,5 +3,8 @@ export default class Board {
 
     constructor(name: string){
         this.name = name;
+
+
+        if (name === "") throw new Error("Name is required")
     }
 }
