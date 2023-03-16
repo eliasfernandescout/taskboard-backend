@@ -1,4 +1,4 @@
-import Card from "../../src/domain/Card";
+import Card from "../../src/domain/entity/Card";
 
 
 test("Deve criar um cartao", function(){
