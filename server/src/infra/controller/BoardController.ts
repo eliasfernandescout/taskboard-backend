@@ -22,5 +22,12 @@ export default class BoardController{
             const boards = await boardService.getBoards();
             return boards;
         });
+
+        httpsServer.route("get", "/boards/:idBoard", async function (params: any, body: any){
+            const boardRepository = new BoardRepositoryDatabase(connection)
+            const boardService = new BoardService(boardRepository, columnRepository, cardRepository);
+            const boards = await boardService.getBoard(params.idBoard);
+            return boards;
+        });
     }
 }

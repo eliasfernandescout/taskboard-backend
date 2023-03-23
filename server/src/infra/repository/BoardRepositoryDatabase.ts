@@ -20,7 +20,7 @@ export default class BoardRepositoryDatabase implements BoardRepository{
     };
 
     async get(idBoard: number): Promise<Board> {
-        const [boardData] = await this.connection.query("select id_board, name from taskboard.board where id_board =$1", [idBoard]);        
+        const [boardData] = await this.connection.query("select * from taskboard.board where id_board =$1", [idBoard]);        
         if(!boardData) throw new Error("Board not found")
         const board = new Board(boardData.name);
         return board;   
