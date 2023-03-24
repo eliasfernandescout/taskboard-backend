@@ -1,103 +1,49 @@
-<script>
+<script setup lang="ts">
 import axios from "axios";
+import { onMounted, reactive, computed } from "vue";
+import BoardView from "./views/BoardView.vue";
 
-export default {
-    data(){
-        return {
-          board: {
-              name: "Project A",
-              columns: [
-                  {
-                    name: "Todo",
-                    cards: [
-                      {title: "A", estimative: 3},
-                      {title: "B", estimative: 2},
-                      {title: "C", estimative: 1}
+let data: any = reactive({})
+  let columnName = ""
+  let cardTitle= "";
 
-                      
-                    ]
-                  },
-                  {
-                    name: "Doing",
-                    cards: []
-                  },
-                  {
-                    name: "Done",
-                    cards: []
-                  }
-              ]
+  function addColumn(columnName: string){
+    data.board.columns.push({name: columnName, cards:[]});
+  };
 
-          },
-          columnName: ""
-        }  
-    },
-    methods: {
-      addColumn(columnName){
-        this.board.columns.push({name: columnName, cards:[]});
-      }
-    },
-    async mounted(){
-     const response = await axios({
-        url: "http://localhost:3000/boards/1",
-        method: "get"
-      });
-      this.board = response.data;
-    }
+  function addCard(column: any, cardTitle: string){
+    column.cards.push({title: cardTitle, estimative: 3})
+    column.estimative += 3
+  };
 
+  function increaseEstimative(card: any){
+    card.estimative ++;
+  };
 
-}
+  const boardEstimative = computed(()=>{
+    return data.board.columns.reduce((total: number, column: any) => {
+        total += column.cards.reduce((total: number, card: any) => {
+          total += card.estimative;
+          return total;
+        }, 0);
+        return total;
+      }, 0);
+  })
+
+  onMounted(async () => {
+    const response = await axios({
+      url: "http://localhost:3000/boards/1",
+      method: "get"
+    });
+
+    data.board = response.data
+  });
 </script>
 
 <template>
-  <h3>{{board.name}} {{ board.estimative }}</h3>
-  <div class="columns">
-    <div class="column" v-for="column in board.columns">
-      <h3>{{column.name}} {{ column.estimative }}</h3>
-      <div class="card" v-for="card in column.cards">
-        {{ card.title }}      
-      </div>
-    </div> 
-      <div class="column new-column">
-        {{ columnName }}
-        <input type="text" v-model="columnName">
-        <button v-on:click="addColumn(columnName)">Add</button>
-
-      </div>
-  </div>
-
-    
+  <!--ROUTER-->
+  <BoardView></BoardView>
 </template>
 
 <style scoped>
-.columns{
-  display: flex;
-  flex-direction: row;
-}
-.column{
-  width: 200px;
-  text-align: center;
-  background-color: #d3cecea1;
-  margin-right: 5px;
-  padding: 10px;
-  border: 1px solid;
-}
-
-.new-column{
-  background-color: #EEE;
-  border: 1px dashed #CCC;
-  display: block;
-}
-
-.card{
-  text-align: center;
-  width: 100%;
-  height: 100px;
-  background-color: coral;
-  border: 1px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-}
 </style>
-
