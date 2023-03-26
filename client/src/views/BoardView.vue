@@ -1,63 +1,42 @@
 <script setup lang="ts">
 import axios from "axios";
-import { onMounted, reactive, computed } from "vue";
+import { onMounted, reactive, computed, ref } from "vue";
 import Board from "../entities/Board";
 
-// let data: any = reactive({})
-//   let columnName = ""
-//   let cardTitle= "";
+const data: {board: Board | undefined} = reactive({board: undefined})
+let cardTitle = ref("");
 
-//   function addColumn(columnName: string){
-//     data.board.columns.push({name: columnName, cards:[]});
-//   };
-
-//   function addCard(column: any, cardTitle: string){
-//     column.cards.push({title: cardTitle, estimative: 3})
-//     column.estimative += 3
-//   };
-
-//   function increaseEstimative(card: any){
-//     card.estimative ++;
-//   };
-
-//   const boardEstimative = computed(()=>{
-//     return data.board.columns.reduce((total: number, column: any) => {
-//         total += column.cards.reduce((total: number, card: any) => {
-//           total += card.estimative;
-//           return total;
-//         }, 0);
-//         return total;
-//       }, 0);
-//   })
-
-  onMounted(async () => {
-    const response = await axios({
-      url: "http://localhost:3000/boards/1",
-      method: "get"
-    });
-
-    const boardData = response.data;
-    const board = new Board(boardData.name)
-
-    for (const columnData of boardData.columns){
-      board.addColumn(columnData.name, columnData.estimative);
-      for(const cardData of columnData.cards){
-        
-      }
-    }
+onMounted(async () => {
+  const response = await axios({
+    url: "http://localhost:3000/boards/1",
+    method: "get",
   });
+
+  const boardData = response.data;
+  const board = new Board(boardData.name);
+
+  for (const columnData of boardData.columns) {
+    board.addColumn(columnData.name, columnData.estimative);
+    for (const cardData of columnData.cards) {
+      board.addCard(columnData.name, cardData.title, cardData.estimative)
+    }
+  }
+
+  data.board = board;
+});
 </script>
-<!-- 
+
+
 <template>
 <div v-if="data.board">
-    <h3>{{ data.board.name }} {{ boardEstimative }}</h3>
+    <h3>{{ data.board.name }} {{ data.board.getEstimative }}</h3>
     <div class="columns">
       <div class="column" v-for="column in data.board.columns">
-        <h3>{{ column.name }} {{ column.estimative }}</h3>
+        <h3>{{ column.name }} {{ column.getEstimative() }}</h3>
         <div class="card" v-for="card in column.cards">
           {{ card.title }} {{ card.estimative }}
           <br />
-          <button @click="increaseEstimative(card)">+</button><button>-</button>
+          <!-- <button @click="increaseEstimative(card)">+</button><button>-</button> -->
         </div>
         <div class="card new-card">
           <input type="text" v-model="cardTitle" />
@@ -71,7 +50,7 @@ import Board from "../entities/Board";
       </div>
     </div>
 </div>
-</template> -->
+</template>
 
 <style scoped>
 .columns {
