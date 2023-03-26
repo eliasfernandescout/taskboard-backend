@@ -25,10 +25,7 @@ export default class Board {
 
     getEstimative(){
         return this.columns.reduce((total: number, column: Column) => {
-            total += column.cards.reduce((total: number, card: any) => {
-              total += card.estimative;
-              return total;
-            }, 0);
+            total += column.getEstimative();
             return total;
           }, 0);
     };
